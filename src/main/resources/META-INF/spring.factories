@@ -1,0 +1,5 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+ru.globaltruck.config.KafkaSenderConfig
+
+#org.springframework.boot.env.EnvironmentPostProcessor=\
+#ru.globaltruck.web.config.loader.WebPropertiesLoader

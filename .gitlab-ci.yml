@@ -1,0 +1,31 @@
+variables:
+  GRADLE_USER_HOME: $CI_PROJECT_DIR/.gradle
+  GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+  REGISTRY: "cr.yandex/crp0ksod9rm0k5vgasjr"
+
+stages:
+  - build
+  - release
+
+build:
+  image: $REGISTRY/devops/gradle:6.7.1-jdk11
+  stage: build
+  script: gradle build
+
+release:
+  image: $REGISTRY/devops/gradle:6.7.1-jdk11
+  stage: release
+  when: manual
+  script:
+    - env
+    - git remote set-url origin https://gitlab-ci-token:$PUBLISH_RELEASE_TOKEN@$CI_SERVER_HOST/$CI_PROJECT_PATH.git
+    - git config user.email "gitlab@example.com"
+    - git config user.name "Gitlab"
+    - git config http.sslverify "false"
+    - git checkout -b $CI_COMMIT_BRANCH
+    - gradle release -Prelease.releaseVersion=$RELEASE_VERSION -Prelease.newVersion=$NEW_VERSION
+    - latestTag=$(git describe --tags `git rev-list --tags --max-count=1`)
+    - git checkout $latestTag
+    - gradle publish
+  only:
+    - master
